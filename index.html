@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halflings Hollow Espresso - Interactive Menu</title>
+    
+    <!-- Google Fonts: Cinzel for cozy fantasy headings, Lora for literary serif descriptions -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS for modern design utility -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        lora: ['Lora', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        cozy: {
+                            gold: '#dfb76c',
+                            goldlight: '#f3d99d',
+                            green: '#2d5a27',
+                            greenlight: '#427c3b',
+                            darkgreen: '#1a3b16',
+                            brown: '#3e2723',
+                            wood: '#2d1a12',
+                            cream: '#fdfbf7',
+                            amber: '#cca053',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Apply Background.png with graceful visual fallback */
+        body {
+            background-image: linear-gradient(to bottom, rgba(45, 26, 18, 0.88), rgba(26, 59, 22, 0.92)), url('Background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        /* Custom elegant scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.25);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #dfb76c;
+            border-radius: 3px;
+        }
+
+        /* Dot Leaders with transparent text boundaries */
+        .dot-leader {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            width: 100%;
+        }
+        .dot-leader::after {
+            content: "";
+            position: absolute;
+            bottom: 6px;
+            left: 0;
+            right: 0;
+            border-bottom: 2px dotted rgba(223, 183, 108, 0.35);
+            z-index: 1;
+        }
+        .dot-leader-title {
+            background: transparent;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Disposable Coffee Cup Blueprint Styling */
+        .disposable-cup-container {
+            position: relative;
+            width: 180px;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* The Rolled Sipping Rim of a Disposable Cup */
+        .cup-rim {
+            width: 190px;
+            height: 12px;
+            background: linear-gradient(90deg, #ffffff 0%, #e0e0e0 50%, #ffffff 100%);
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 40;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* The tapered disposable cup outer wall */
+        .cup-body-outer {
+            width: 180px;
+            height: 238px;
+            background: rgba(255, 255, 255, 0.04);
+            border-top: none;
+            /* Tapered shape: top is wider, bottom is narrower */
+            clip-path: polygon(0% 0%, 100% 0%, 82% 100%, 18% 100%);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Inner container for layers with strict clipping so liquid fits the taper */
+        .cup-body-inner {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column; /* Stack top-to-bottom so Foam sits naturally on top */
+            overflow: hidden;
+        }
+
+        /* 3-LAYER STACKING ARCHITECTURE FOR CUP CONTENTS: */
+        
+        /* Layer 1: Colored Fluids Background (Bottom, z-0) */
+        .fluid-bg-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column; /* Stack top-to-bottom */
+            z-index: 1;
+            transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Layer 2: Floating Ice Cubes Layer (Middle, z-10) */
+        .ice-cubes-container {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .cold-active .ice-cubes-container {
+            opacity: 0.9;
+        }
+
+        /* Layer 3: Ingredient Text & Labels Layer (Top, z-20) */
+        .fluid-labels-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column; /* Stack top-to-bottom */
+            z-index: 20;
+            pointer-events: none;
+            transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Angled sweep highlight moving left to right (10% opacity) */
+        .glass-highlight {
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.08) 30%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.08) 70%,
+                transparent
+            );
+            transform: skewX(-25deg);
+            z-index: 15; /* Sits above liquids and ice, below text */
+            pointer-events: none;
+            animation: gloss-sweep 6s infinite ease-in-out;
+        }
+
+        @keyframes gloss-sweep {
+            0% { left: -150%; }
+            35% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        /* Dynamic Fluid Background Layers */
+        .fluid-layer-bg {
+            width: 100% !important;
+            flex-shrink: 0;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Dynamic Text Labels Layers (strictly mapped matching height) */
+        .fluid-layer-label {
+            width: 100% !important;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-align: center;
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.9), 0px 0px 2px rgba(0, 0, 0, 0.8);
+            padding: 0 10px;
+            
+            /* Add fade-in animation, initially hidden */
+            opacity: 0;
+            transition: opacity 0.4s ease-in;
+        }
+
+        /* Active class to fade labels in after fluid is in place */
+        .labels-visible .fluid-layer-label {
+            opacity: 1;
+        }
+
+        /* Palette Definitions and Subtle Foam Division */
+        .layer-crema { background: linear-gradient(180deg, #d2a679 0%, #b08257 100%); }
+        .layer-espresso { background: linear-gradient(180deg, #3d2314 0%, #200f07 100%); }
+        .layer-milk { background: linear-gradient(180deg, #fffcf0 0%, #f7f2d3 100%); }
+        .layer-foam { 
+            background: linear-gradient(180deg, #ffffff 0%, #fffcf2 100%); 
+            border-bottom: 2px dashed rgba(62, 39, 35, 0.25); /* Subtle border under foam cap */
+        }
+        .layer-chocolate { background: linear-gradient(180deg, #4e2f1d 0%, #2b1408 100%); }
+        .layer-white-chocolate { background: linear-gradient(180deg, #fdfbf7 0%, #f5eee0 100%); }
+        .layer-cream { background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%); }
+        .layer-water { background: linear-gradient(180deg, #e3f2fd 30%, #bbdefb 100%); }
+        .layer-tea { background: linear-gradient(180deg, #b8860b 0%, #8b6508 100%); }
+        .layer-chai { background: linear-gradient(180deg, #dca873 0%, #c48c53 100%); }
+        .layer-energy { background: linear-gradient(135deg, #ec407a 0%, #9c27b0 100%); }
+        .layer-soda { background: linear-gradient(180deg, #e0f7fa 0%, #4dd0e1 100%); }
+        .layer-smoothie { background: linear-gradient(180deg, #ff7043 0%, #d84315 100%); }
+
+        /* Stable, slow rising hot steam lines */
+        .steam-container {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        .steam-wave {
+            width: 3px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.22);
+            border-radius: 50%;
+            filter: blur(1.2px);
+            animation: steam-rise 4.5s infinite ease-in-out;
+        }
+        .steam-wave:nth-child(2) { animation-delay: 1.2s; height: 44px; }
+        .steam-wave:nth-child(3) { animation-delay: 2.4s; }
+
+        @keyframes steam-rise {
+            0% { transform: translateY(12px) scaleX(1); opacity: 0; }
+            50% { transform: translateY(-8px) scaleX(1.4); opacity: 0.4; }
+            100% { transform: translateY(-24px) scaleX(0.7); opacity: 0; }
+        }
+
+        /* Ice cubes placed in intermediate z-index (z-10) */
+        .ice-cube {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.45);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            position: absolute;
+            transform: rotate(15deg);
+        }
+        .ice-1 { bottom: 30px; left: 35px; transform: rotate(12deg); }
+        .ice-2 { bottom: 70px; right: 40px; transform: rotate(-24deg); }
+        .ice-3 { bottom: 120px; left: 50px; transform: rotate(42deg); }
+    </style>
+</head>
+<body class="text-cozy-cream font-sans selection:bg-cozy-gold selection:text-cozy-wood overflow-x-hidden">
+
+    <!-- Brand Top Bar Header -->
+    <header class="w-full py-4 px-6 md:px-12 bg-black/50 backdrop-blur-md border-b border-cozy-gold/25 flex justify-between items-center z-50 relative">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full border border-cozy-gold flex items-center justify-center bg-cozy-darkgreen/60">
+                <span class="text-xl">🍂</span>
+            </div>
+            <div>
+                <h1 class="font-cinzel text-lg font-bold tracking-wider text-cozy-gold">Halflings Hollow Espresso</h1>
+                <p class="text-xs tracking-widest text-cozy-goldlight/60 uppercase">Traditional Shire Coffee & Brews</p>
+            </div>
+        </div>
+
+        <div>
+            <button id="story-btn" class="text-xs px-4 py-2 rounded-full border border-cozy-gold/40 text-cozy-goldlight hover:bg-cozy-gold hover:text-cozy-wood transition duration-300 font-bold uppercase tracking-wider">
+                Our Hearth
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
+        
+        <!-- LEFT COLUMN: The Interactive Menu List -->
+        <section class="lg:col-span-7 space-y-8">
+            
+            <!-- Hero Title Panel with custom mathematical border radius matching -->
+            <div class="bg-cozy-wood/85 border-2 border-cozy-gold/40 rounded-[2.5rem] p-8 backdrop-blur-md text-center relative overflow-hidden shadow-2xl">
+                <div class="absolute -top-10 -left-10 w-40 h-40 bg-cozy-gold/5 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-10 -right-10 w-45 h-45 bg-cozy-green/10 rounded-full blur-3xl"></div>
+                
+                <h2 class="font-cinzel text-4xl md:text-5xl font-black text-cozy-gold tracking-widest mb-2 uppercase">Drink Menu</h2>
+                <div class="w-32 h-0.5 bg-gradient-to-r from-transparent via-cozy-gold to-transparent mx-auto mb-4"></div>
+                <p class="font-lora italic text-cozy-goldlight/85 text-sm md:text-base max-w-xl mx-auto">
+                    Select a recipe from our board below. A visual blueprint of ingredients and ratios will formulate in the hollow’s cup container.
+                </p>
+
+                <!-- Filter Controls with proportionate math: Outer Card R_outer=40px, padding=32px, inner button = rounded-lg (8px) -->
+                <div class="mt-6 flex flex-wrap gap-2 justify-center">
+                    <button onclick="filterMenu('all')" id="filter-all" class="filter-btn active px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition bg-cozy-gold text-cozy-wood">All Recipes</button>
+                    <button onclick="filterMenu('hot')" id="filter-hot" class="filter-btn px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition bg-cozy-brown/60 text-cozy-goldlight hover:bg-cozy-gold/20">Hot Comforts</button>
+                    <button onclick="filterMenu('cold')" id="filter-cold" class="filter-btn px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition bg-cozy-brown/60 text-cozy-goldlight hover:bg-cozy-gold/20">Cold Refreshers</button>
+                    <button onclick="filterMenu('extras')" id="filter-extras" class="filter-btn px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition bg-cozy-brown/60 text-cozy-goldlight hover:bg-cozy-gold/20">Custom Extras</button>
+                </div>
+            </div>
+
+            <!-- HOT DRINKS SECTION -->
+            <div id="section-hot" class="menu-section bg-cozy-wood/85 border border-cozy-gold/30 rounded-[2rem] p-5 backdrop-blur-md shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-cozy-gold/20 pb-4 px-2">
+                    <span class="text-2xl">☕</span>
+                    <div>
+                        <h3 class="font-cinzel text-xl font-bold text-cozy-gold tracking-wide">Hot Comforts</h3>
+                        <p class="text-xs text-cozy-goldlight/60">Steaming mugs brewed fresh on our clay fireplace</p>
+                    </div>
+                </div>
+                <div id="hot-drinks-container" class="space-y-3">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- COLD DRINKS SECTION -->
+            <div id="section-cold" class="menu-section bg-cozy-wood/85 border border-cozy-gold/30 rounded-[2rem] p-5 backdrop-blur-md shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-cozy-gold/20 pb-4 px-2">
+                    <span class="text-2xl">🍹</span>
+                    <div>
+                        <h3 class="font-cinzel text-xl font-bold text-cozy-gold tracking-wide">Cold Refreshers</h3>
+                        <p class="text-xs text-cozy-goldlight/60">Chilled with glacial ice from the high peaks</p>
+                    </div>
+                </div>
+                <div id="cold-drinks-container" class="space-y-3">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- EXTRAS SECTION -->
+            <div id="section-extras" class="menu-section bg-cozy-wood/85 border border-cozy-gold/30 rounded-[2rem] p-5 backdrop-blur-md shadow-xl space-y-4">
+                <div class="flex items-center gap-3 border-b border-cozy-gold/20 pb-4 px-2">
+                    <span class="text-2xl">🌿</span>
+                    <div>
+                        <h3 class="font-cinzel text-xl font-bold text-cozy-gold tracking-wide">Custom Additions</h3>
+                        <p class="text-xs text-cozy-goldlight/60">Fine-tune the weights & measures of your draught</p>
+                    </div>
+                </div>
+                <div id="extras-container" class="space-y-3">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: Desktop Sticky Blueprint & Cup Showcase -->
+        <section class="lg:col-span-5 lg:sticky lg:top-8 space-y-6 hidden lg:block" id="desktop-detail-panel">
+            <div class="bg-cozy-darkgreen/90 border-2 border-cozy-gold rounded-[2.5rem] p-6 backdrop-blur-md shadow-2xl flex flex-col items-center text-center relative overflow-hidden min-h-[580px] justify-between">
+                
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(223,183,108,0.1),transparent)] pointer-events-none"></div>
+
+                <!-- Top Row Info Badge -->
+                <div class="w-full flex justify-between items-center border-b border-cozy-gold/20 pb-3 mb-4">
+                    <span class="text-[10px] uppercase tracking-widest text-cozy-gold/80 font-bold">Cup Architecture</span>
+                    <span id="drink-temp-badge" class="px-2.5 py-0.5 rounded-md text-[10px] uppercase font-black tracking-widest bg-orange-600/30 text-orange-400 border border-orange-500/20">Hot Brew</span>
+                </div>
+
+                <!-- Showcase static illustration or dynamic cup architecture based on selection -->
+                <div class="relative py-6 flex justify-center items-center w-full">
+                    
+                    <!-- Dynamic steam overlay -->
+                    <div id="steam-visual" class="steam-container">
+                        <div class="steam-wave"></div>
+                        <div class="steam-wave"></div>
+                        <div class="steam-wave"></div>
+                    </div>
+
+                    <!-- The Disposable Cup Element -->
+                    <div id="desktop-disposable-cup" class="disposable-cup-container">
+                        <div class="cup-rim"></div>
+                        
+                        <div class="cup-body-outer">
+                            <!-- Inner space clipping content -->
+                            <div class="cup-body-inner">
+                                
+                                <!-- Layer 1: Colored Fluid Backgrounds (z-index: 1) -->
+                                <div id="desktop-fluids-bg" class="fluid-bg-container"></div>
+                                
+                                <!-- Layer 2: Middle Ice Layer (z-index: 10) -->
+                                <div class="ice-cubes-container">
+                                    <div class="ice-cube ice-1"></div>
+                                    <div class="ice-cube ice-2"></div>
+                                    <div class="ice-cube ice-3"></div>
+                                </div>
+
+                                <!-- Reflection Sweeping highlight overlay -->
+                                <div class="glass-highlight"></div>
+
+                                <!-- Layer 3: Ingredient Text Labels (z-index: 20) -->
+                                <div id="desktop-fluids-labels" class="fluid-labels-container"></div>
+
+                            </div>
+                        </div>
+
+                        <!-- Non-clipped SVG outline sitting perfectly over the tapered body to prevent clip cutoff -->
+                        <svg class="absolute top-[12px] w-[180px] h-[238px] pointer-events-none z-35" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path d="M 0,0 L 100,0 L 82,100 L 18,100 Z" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="2" />
+                        </svg>
+                    </div>
+
+                    <!-- Custom Extra Static Icon Showcase (Hides cup when custom extras selected) -->
+                    <div id="desktop-extra-icon-container" class="hidden w-[180px] h-[250px] flex-col items-center justify-center text-cozy-gold">
+                        <!-- Filled by JS with custom vector icons -->
+                    </div>
+
+                </div>
+
+                <!-- Descriptive Information Panel -->
+                <div class="space-y-3 w-full px-2 z-10">
+                    <h3 id="detail-name" class="font-cinzel text-2xl font-bold text-cozy-gold tracking-wide">Select a Brew</h3>
+                    <p id="detail-desc" class="font-lora text-sm text-cozy-cream/80 italic leading-relaxed min-h-[60px]">
+                        Click on any hot drink or iced refreshment from our parchment on the left to unpack its standard formulation and layers.
+                    </p>
+
+                    <!-- Interactive Modifiers / Variations Panel -->
+                    <div id="desktop-variants-container" class="w-full bg-black/20 p-3 rounded-xl border border-cozy-gold/15 space-y-2 hidden">
+                        <span id="desktop-variants-label" class="text-[9px] font-extrabold uppercase tracking-widest text-cozy-gold block text-left">Custom Adjustment</span>
+                        <div id="desktop-variants-buttons" class="flex flex-wrap gap-2 justify-start">
+                            <!-- Populated on choice -->
+                        </div>
+                    </div>
+                    
+                    <!-- Recipe Preparation Box -->
+                    <div id="recipe-card" class="bg-cozy-wood/75 border border-cozy-gold/25 rounded-2xl p-4 text-left space-y-2 mt-2 hidden">
+                        <h4 class="text-[10px] font-bold uppercase tracking-wider text-cozy-gold">Hollow preparation secrets</h4>
+                        <p id="recipe-text" class="text-xs text-cozy-cream/80 leading-relaxed font-sans"></p>
+                    </div>
+                </div>
+
+                <div class="w-full pt-4 border-t border-cozy-gold/15 mt-4 text-[10px] text-cozy-goldlight/40 font-bold uppercase tracking-wider">
+                    Hand-measured formulations
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM SHEET MODAL: Slides up on smaller viewports -->
+    <div id="mobile-detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden">
+        <div class="bg-cozy-darkgreen border-t-2 border-cozy-gold rounded-t-[3rem] w-full max-h-[92vh] overflow-y-auto p-6 space-y-6 flex flex-col items-center text-center transform translate-y-full transition-transform duration-300 shadow-2xl relative">
+            
+            <button onclick="closeMobileModal()" class="w-16 h-1 bg-cozy-gold/30 rounded-full mb-1 hover:bg-cozy-gold/60 transition"></button>
+            
+            <button onclick="closeMobileModal()" class="absolute top-5 right-5 text-cozy-goldlight hover:text-cozy-gold bg-cozy-wood/65 w-8 h-8 rounded-full flex items-center justify-center">
+                ✕
+            </button>
+
+            <span id="mobile-drink-temp-badge" class="px-3 py-1 rounded-md text-[10px] uppercase font-black tracking-widest bg-orange-600/30 text-orange-400 border border-orange-500/20">Hot Brew</span>
+
+            <!-- Mobile Cup Placement -->
+            <div class="relative py-4 flex justify-center items-center w-full">
+                <!-- Mobile Steam -->
+                <div id="steam-visual-mobile" class="steam-container">
+                    <div class="steam-wave"></div>
+                    <div class="steam-wave"></div>
+                    <div class="steam-wave"></div>
+                </div>
+
+                <!-- The Mobile Disposable Cup -->
+                <div id="mobile-disposable-cup" class="disposable-cup-container">
+                    <div class="cup-rim"></div>
+                    
+                    <div class="cup-body-outer">
+                        <div class="cup-body-inner">
+                            <!-- Background fluids -->
+                            <div id="mobile-fluids-bg" class="fluid-bg-container"></div>
+                            
+                            <!-- Middle Ice Layer -->
+                            <div class="ice-cubes-container">
+                                <div class="ice-cube ice-1"></div>
+                                <div class="ice-cube ice-2"></div>
+                                <div class="ice-cube ice-3"></div>
+                            </div>
+
+                            <div class="glass-highlight"></div>
+
+                            <!-- Text labels overlay -->
+                            <div id="mobile-fluids-labels" class="fluid-labels-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Non-clipped SVG outline -->
+                    <svg class="absolute top-[12px] w-[180px] h-[238px] pointer-events-none z-35" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M 0,0 L 100,0 L 82,100 L 18,100 Z" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="2" />
+                    </svg>
+                </div>
+
+                <!-- Mobile Custom Extra Static Icon Showcase -->
+                <div id="mobile-extra-icon-container" class="hidden w-[180px] h-[250px] flex-col items-center justify-center text-cozy-gold">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+
+            <!-- Content details -->
+            <div class="space-y-3 w-full">
+                <h3 id="mobile-detail-name" class="font-cinzel text-3xl font-bold text-cozy-gold">Latte</h3>
+                <p id="mobile-detail-desc" class="font-lora text-sm text-cozy-cream/90 italic leading-relaxed">
+                    Description...
+                </p>
+
+                <!-- Interactive Modifiers / Variations Panel Mobile -->
+                <div id="mobile-variants-container" class="w-full bg-black/20 p-3 rounded-xl border border-cozy-gold/15 space-y-2 hidden">
+                    <span id="mobile-variants-label" class="text-[9px] font-extrabold uppercase tracking-widest text-cozy-gold block text-left">Custom Adjustment</span>
+                    <div id="mobile-variants-buttons" class="flex flex-wrap gap-2 justify-center">
+                        <!-- Populated on choice -->
+                    </div>
+                </div>
+
+                <!-- Nested elements inside mobile bottom sheet follow calculated concentric corners -->
+                <div id="mobile-recipe-card" class="bg-cozy-wood border border-cozy-gold/25 rounded-3xl p-5 text-left space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-cozy-gold">Hollow preparation secrets</h4>
+                    <p id="mobile-recipe-text" class="text-xs text-cozy-cream/80 leading-relaxed font-sans"></p>
+                </div>
+            </div>
+
+            <button onclick="closeMobileModal()" class="w-full bg-cozy-gold text-cozy-wood font-extrabold tracking-wider py-4 rounded-xl hover:bg-cozy-goldlight transition duration-300 uppercase text-xs mt-2 shadow-lg">
+                Return to tavern board
+            </button>
+        </div>
+    </div>
+
+    <!-- TAVERN STORY MODAL -->
+    <div id="story-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 p-4">
+        <div class="bg-cozy-wood border-2 border-cozy-gold rounded-[2.5rem] max-w-lg p-8 space-y-4 text-center transform scale-95 transition-transform duration-300 relative shadow-2xl">
+            <button onclick="toggleStoryModal(false)" class="absolute top-5 right-5 text-cozy-goldlight hover:text-cozy-gold">
+                ✕
+            </button>
+            <h3 class="font-cinzel text-2xl font-bold text-cozy-gold">Halflings Hollow Espresso</h3>
+            <div class="w-24 h-0.5 bg-cozy-gold mx-auto my-2"></div>
+            <p class="font-lora text-sm md:text-base leading-relaxed text-cozy-cream/90 italic">
+                "Nestled beneath the turf roof, where purple lupines and birch trees frame our green circular door, we keep our hearth fires burning day and night. We pull fresh, robust espresso with care and steam rich local creams for every traveler who walks down our stone path."
+            </p>
+            <button onclick="toggleStoryModal(false)" class="bg-cozy-gold text-cozy-wood px-6 py-2.5 rounded-lg font-bold uppercase tracking-wider text-xs hover:bg-cozy-goldlight transition mt-4">
+                Step inside
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // High fidelity custom SVG icons representing custom extras
+        const customExtraIcons = {
+            "addcream": `
+                <svg viewBox="0 0 100 100" class="w-24 h-24 text-cozy-goldlight" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M 50,15 C 60,15 65,30 50,45 C 35,30 40,15 50,15 Z" fill="rgba(255, 255, 255, 0.25)" />
+                    <path d="M 25,65 C 20,50 35,40 50,45 C 65,40 80,50 75,65 C 70,80 30,80 25,65 Z" fill="rgba(255, 255, 255, 0.15)" />
+                    <path d="M 15,75 C 20,70 80,70 85,75 C 80,85 20,85 15,75 Z" fill="rgba(255, 255, 255, 0.1)" />
+                    <path d="M 50,10 C 35,25 30,45 25,65 C 25,75 75,75 75,65 C 70,45 65,25 50,10" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M 30,60 C 45,55 55,55 70,60" />
+                </svg>
+                <span class="text-xs font-black uppercase tracking-widest text-cozy-goldlight mt-4">Whipped Sweet Cream</span>
+            `,
+            "extrashot": `
+                <svg viewBox="0 0 100 100" class="w-24 h-24 text-cozy-goldlight" fill="none" stroke="currentColor" stroke-width="3">
+                    <!-- Coffee Cup -->
+                    <path d="M 25,35 L 75,35 L 68,75 C 67,82 59,85 50,85 C 41,85 33,82 32,75 Z" fill="rgba(223, 183, 108, 0.1)" stroke-linejoin="round" />
+                    <!-- Cup Handle -->
+                    <path d="M 75,45 C 85,45 85,60 72,60" />
+                    <!-- Floating Steam Lines -->
+                    <path d="M 38,15 Q 43,20 38,25" stroke-linecap="round" />
+                    <path d="M 50,10 Q 55,17 50,25" stroke-linecap="round" />
+                    <path d="M 62,15 Q 67,20 62,25" stroke-linecap="round" />
+                </svg>
+                <span class="text-xs font-black uppercase tracking-widest text-cozy-goldlight mt-4">Extra Espresso Shot</span>
+            `,
+            "milkalternative": `
+                <svg viewBox="0 0 100 100" class="w-24 h-24 text-cozy-goldlight" fill="none" stroke="currentColor" stroke-width="3">
+                    <!-- Milk Carton -->
+                    <path d="M 35,35 L 50,20 L 65,35 L 65,85 L 35,85 Z" fill="rgba(255, 255, 255, 0.15)" stroke-linejoin="round" />
+                    <path d="M 35,35 L 65,35" />
+                    <!-- Leaf Modifier representing Plant-based milk alternative -->
+                    <path d="M 42,55 C 48,45 55,48 58,58 C 50,65 45,62 42,55 Z" fill="rgba(223, 183, 108, 0.3)" />
+                    <path d="M 42,61 L 58,52" />
+                </svg>
+                <span class="text-xs font-black uppercase tracking-widest text-cozy-goldlight mt-4">Plant Milk Alternative</span>
+            `
+        };
+
+        // Full Authentic Dataset from Menu.jpg mapping items, categories, recipes, exact ratios, and fill capacities
+        const menuDataset = {
+            // HOT DRINKS
+            "doppio": {
+                name: "Doppio",
+                category: "hot",
+                description: "A double shot of pure, uncompromised espresso. Bold, intense, and crowned with a hazelnut-colored crema.",
+                recipe: "Pulled perfectly under pressure. Two shots of premium ground dark-roasted beans delivered directly to your hot cup.",
+                prices: { "12 oz": "$3.00", "16 oz": "--", "20 oz": "--" },
+                cupHeight: "25%", // Represents 2-3oz double espresso shot in a 12oz cup
+                layers: [
+                    { type: "crema", height: "15%", label: "Rich Crema" },
+                    { type: "espresso", height: "85%", label: "Espresso Shots (2oz)" }
+                ]
+            },
+            "americano": {
+                name: "Americano",
+                category: "hot",
+                description: "Espresso shots extended with hot water. Retains the deep aromatic qualities of a fine drip coffee with espresso character.",
+                recipe: "Double espresso shots pulled gently over pre-heated hot water to preserve the crema floating on top.",
+                prices: { "12 oz": "$4.25", "16 oz": "$4.75", "20 oz": "$5.50" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "crema", height: "8%", label: "Espresso Crema" },
+                    { type: "espresso", height: "25%", label: "Espresso" },
+                    { type: "water", height: "67%", label: "Hot Water" }
+                ]
+            },
+            "cappuccino": {
+                name: "Cappuccino",
+                category: "hot",
+                description: "The traditionalist's favorite. Structured in equal thirds of rich espresso, sweet steamed milk, and a cloud of microfoam.",
+                recipe: "We steam fresh dairy milk to construct a dense, pillowy foam blanket. Poured over hot espresso to preserve layered distinction.",
+                prices: { "12 oz": "$5.00", "16 oz": "$5.75", "20 oz": "$6.50" },
+                cupHeight: "92%",
+                variants: {
+                    label: "Foam Preference",
+                    options: ["Standard", "Wet", "Dry"],
+                    active: "Standard",
+                    specs: {
+                        "Standard": [
+                            { type: "foam", height: "35%", label: "Pillowy Milk Foam" },
+                            { type: "milk", height: "35%", label: "Steamed Milk" },
+                            { type: "espresso", height: "30%", label: "Espresso Base" }
+                        ],
+                        "Wet": [
+                            { type: "foam", height: "15%", label: "Silky Light Foam" },
+                            { type: "milk", height: "55%", label: "Steamed Milk" },
+                            { type: "espresso", height: "30%", label: "Espresso Base" }
+                        ],
+                        "Dry": [
+                            { type: "foam", height: "55%", label: "Thick Heavy Foam" },
+                            { type: "milk", height: "15%", label: "Steamed Milk" },
+                            { type: "espresso", height: "30%", label: "Espresso Base" }
+                        ]
+                    }
+                },
+                layers: [] // Built dynamically from variants active configuration
+            },
+            "latte": {
+                name: "Latte",
+                category: "hot",
+                description: "Smooth, velvety, and endlessly comforting. A base of rich espresso paired with steamed milk and topped with a whisper of sweet foam.",
+                recipe: "Fresh espresso blended with textured steamed milk, creating a uniform, creamy cup with a light, silky capping of foam.",
+                prices: { "12 oz": "$5.00", "16 oz": "$5.75", "20 oz": "$6.50" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "foam", height: "12%", label: "Velvet Foam Cap" },
+                    { type: "milk", height: "68%", label: "Steamed Milk" },
+                    { type: "espresso", height: "20%", label: "Espresso Base" }
+                ]
+            },
+            "mocha": {
+                name: "Mocha",
+                category: "hot",
+                description: "A decadent combination of bittersweet chocolate sauce, espresso, and silky steamed milk, topped with rich whipped cream.",
+                recipe: "Dark cocoa melted directly into fresh espresso. Hand-steamed milk is swirled in and capped with homemade vanilla cream.",
+                prices: { "12 oz": "$5.50", "16 oz": "$6.25", "20 oz": "$7.00" },
+                cupHeight: "92%",
+                variants: {
+                    label: "Chocolate Variant",
+                    options: ["Milk Chocolate", "White Chocolate"],
+                    active: "Milk Chocolate",
+                    specs: {
+                        "Milk Chocolate": [
+                            { type: "cream", height: "18%", label: "Whipped Cream" },
+                            { type: "milk", height: "47%", label: "Steamed Milk" },
+                            { type: "espresso", height: "20%", label: "Espresso" },
+                            { type: "chocolate", height: "15%", label: "Bittersweet Cocoa" }
+                        ],
+                        "White Chocolate": [
+                            { type: "cream", height: "18%", label: "Whipped Cream" },
+                            { type: "milk", height: "47%", label: "Steamed Milk" },
+                            { type: "espresso", height: "20%", label: "Espresso" },
+                            { type: "white-chocolate", height: "15%", label: "Creamy White Chocolate" }
+                        ]
+                    }
+                },
+                layers: []
+            },
+            "breve": {
+                name: "Breve",
+                category: "hot",
+                description: "Extremely rich and velvety. Made with robust espresso and steamed half-and-half (cream) instead of milk.",
+                recipe: "Rich half-and-half cream steamed at moderate temperatures for maximum creaminess, finished over our signature espresso.",
+                prices: { "12 oz": "$5.50", "16 oz": "$6.25", "20 oz": "$7.00" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "foam", height: "10%", label: "Rich Foam Head" },
+                    { type: "milk", height: "70%", label: "Steamed Half & Half" },
+                    { type: "espresso", height: "20%", label: "Espresso Shots" }
+                ]
+            },
+            "tea": {
+                name: "Herbal & Classic Tea",
+                category: "hot",
+                description: "Curated loose leaf botanicals, steeped to perfection to warm your spirit on a misty morning.",
+                recipe: "Harvested tea botanicals steeped in filtered water heated perfectly to target aromatic flavor oils without bitterness.",
+                prices: { "12 oz": "$3.25", "16 oz": "$3.75", "20 oz": "$4.00" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "water", height: "10%", label: "Steam Rise" },
+                    { type: "tea", height: "90%", label: "Steeped Botanicals" }
+                ]
+            },
+            "chai": {
+                name: "Chai Latte",
+                category: "hot",
+                description: "Aromatic and spicy. Black tea infused with cardamon, cinnamon, ginger, and cloves, steamed with fresh milk.",
+                recipe: "Premium spiced tea reduction integrated with steamed milk and frothed together to distribute natural forest spices.",
+                prices: { "12 oz": "$5.00", "16 oz": "$5.75", "20 oz": "$6.50" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "foam", height: "15%", label: "Spiced Foam Cap" },
+                    { type: "milk", height: "45%", label: "Steamed Milk" },
+                    { type: "chai", height: "40%", label: "Spiced Chai Tea" }
+                ]
+            },
+            "hotchocolate": {
+                name: "Hot Chocolate",
+                category: "hot",
+                description: "The ultimate cozy fireplace treat. Rich steamed chocolate milk topped with fresh whipped cream.",
+                recipe: "Thick bittersweet cocoa melted completely inside hot steamed milk, crowned with a peak of vanilla whipped cream.",
+                prices: { "12 oz": "$4.00", "16 oz": "$4.75", "20 oz": "$5.50" },
+                cupHeight: "92%",
+                variants: {
+                    label: "Cocoa Variant",
+                    options: ["Milk Chocolate", "White Chocolate"],
+                    active: "Milk Chocolate",
+                    specs: {
+                        "Milk Chocolate": [
+                            { type: "cream", height: "20%", label: "Whipped Cream" },
+                            { type: "chocolate", height: "80%", label: "Steamed Cocoa Milk" }
+                        ],
+                        "White Chocolate": [
+                            { type: "cream", height: "20%", label: "Whipped Cream" },
+                            { type: "white-chocolate", height: "80%", label: "Steamed White Cocoa Milk" }
+                        ]
+                    }
+                },
+                layers: []
+            },
+            "steamer": {
+                name: "Flavored Steamer",
+                category: "hot",
+                description: "Hot, sweet, frothy milk infused with your choice of syrup (Vanilla, Caramel, or Hazelnut). Coffee-free.",
+                recipe: "Gourmet natural syrups combined with fresh whole milk and steamed to create a warm, fluffy, sweet treat.",
+                prices: { "12 oz": "$4.00", "16 oz": "$4.75", "20 oz": "$5.50" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "foam", height: "20%", label: "Frothy Milk Foam" },
+                    { type: "milk", height: "80%", label: "Flavored Steamed Milk" }
+                ]
+            },
+
+            // COLD DRINKS
+            "lotusspecials": {
+                name: "Lotus or Redbull Specials",
+                category: "cold",
+                description: "Vibrant energy infusions served Iced or Blended. Perfect for long walks on sunny Shire trails.",
+                recipe: "Botanical energy bases blended or shaken with real fruit syrups, sparkling club water, and layered over ice.",
+                prices: { "16 oz": "--", "24 oz": "Iced: $6.50 / Blended: $7.50" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "cream", height: "15%", label: "Sweet Cream Swirl" },
+                    { type: "energy", height: "85%", label: "Lotus / Redbull base" }
+                ]
+            },
+            "italiansoda": {
+                name: "Italian Soda",
+                category: "cold",
+                description: "Crisp sparkling water paired with fruit syrups and a classic splash of heavy cream for a bubbly, creamy treat.",
+                recipe: "Syrup layered first, topped with chilled sparkling club soda, ice cubes, and completed with a heavy cream float.",
+                prices: { "16 oz": "$5.00", "24 oz": "$5.50" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "cream", height: "15%", label: "Sweet Heavy Cream" },
+                    { type: "soda", height: "85%", label: "Sparkling Club Soda" }
+                ]
+            },
+            "smoothie": {
+                name: "Fruit Smoothie",
+                category: "cold",
+                description: "Thick, luxurious, real fruit smoothies made with organic purees and blended with ice.",
+                recipe: "Organic berry or stone-fruit purees emulsified with pure ice cubes until thick, velvety, and icy cold.",
+                prices: { "16 oz": "$6.00", "24 oz": "$7.00" },
+                cupHeight: "92%",
+                layers: [
+                    { type: "cream", height: "10%", label: "Cold Whip Swirl" },
+                    { type: "smoothie", height: "90%", label: "Blended Fruit Puree" }
+                ]
+            },
+
+            // EXTRAS
+            "addcream": {
+                name: "Add Cream",
+                category: "extras",
+                description: "Enhance any warm brew or cold draught with a dollop of fresh local whipped cream.",
+                recipe: "Locally-sourced heavy cream, whipped daily at our counter.",
+                prices: { "Standard": "$0.50" },
+                layers: []
+            },
+            "extrashot": {
+                name: "Extra Espresso Shot",
+                category: "extras",
+                description: "For weary travelers needing extra vigor. Add an additional robust shot of dark mountain espresso.",
+                recipe: "An extra 1oz extraction of our dark roasted house blend.",
+                prices: { "Add-on": "$0.75" },
+                layers: []
+            },
+            "milkalternative": {
+                name: "Milk Alternatives",
+                category: "extras",
+                description: "Swap traditional dairy for high-quality Oat, Almond, or Coconut milks.",
+                recipe: "Substituted smoothly in any warm or iced recipe. Perfectly steamed.",
+                prices: { "Upgrade": "$1.00" },
+                layers: []
+            }
+        };
+
+        // Render the Interactive Menu Card List
+        function generateMenuHTML() {
+            const hotContainer = document.getElementById('hot-drinks-container');
+            const coldContainer = document.getElementById('cold-drinks-container');
+            const extrasContainer = document.getElementById('extras-container');
+
+            hotContainer.innerHTML = '';
+            coldContainer.innerHTML = '';
+            extrasContainer.innerHTML = '';
+
+            for (const [key, drink] of Object.entries(menuDataset)) {
+                let sizesHTML = '';
+                for (const [size, price] of Object.entries(drink.prices)) {
+                    if (price !== '--') {
+                        sizesHTML += `
+                            <div class="text-right">
+                                <span class="text-[9px] block uppercase text-cozy-goldlight/50 font-bold tracking-widest">${size}</span>
+                                <span class="text-xs font-extrabold text-cozy-gold font-sans">${price}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                const itemHTML = `
+                    <div onclick="selectDrink('${key}')" id="menu-item-${key}" class="menu-item-card p-4 rounded-[24px] bg-cozy-brown/40 border border-cozy-gold/15 hover:border-cozy-gold hover:bg-cozy-brown/65 transition duration-300 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 group">
+                        <div class="flex-1 space-y-1">
+                            <div class="dot-leader">
+                                <span class="dot-leader-title font-cinzel text-base font-bold text-cozy-cream group-hover:text-cozy-goldlight transition duration-300">
+                                    ${drink.name}
+                                </span>
+                            </div>
+                            <p class="text-xs text-cozy-cream/70 font-sans line-clamp-2 md:line-clamp-1 group-hover:text-cozy-cream transition">
+                                ${drink.description}
+                            </p>
+                        </div>
+                        <div class="flex gap-4 self-end md:self-center bg-black/30 p-2 rounded-lg border border-cozy-gold/10">
+                            ${sizesHTML}
+                        </div>
+                    </div>
+                `;
+
+                if (drink.category === 'hot') {
+                    hotContainer.insertAdjacentHTML('beforeend', itemHTML);
+                } else if (drink.category === 'cold') {
+                    coldContainer.insertAdjacentHTML('beforeend', itemHTML);
+                } else if (drink.category === 'extras') {
+                    extrasContainer.insertAdjacentHTML('beforeend', itemHTML);
+                }
+            }
+        }
+
+        // Advanced Cup Assembly Engine supporting fill heights, custom variants, and synchronized text animation
+        function buildCupLayers(bgContainerId, labelContainerId, cupElementId, drink, activeVariant) {
+            const bgContainer = document.getElementById(bgContainerId);
+            const labelContainer = document.getElementById(labelContainerId);
+            const cupElement = document.getElementById(cupElementId);
+
+            const isCold = drink.category === 'cold';
+
+            // Toggle Ice class
+            if (isCold) {
+                cupElement.classList.add('cold-active');
+            } else {
+                cupElement.classList.remove('cold-active');
+            }
+
+            // Hide labels initially, remove visible class
+            labelContainer.classList.remove('labels-visible');
+
+            // Set visual proportionally to represent size limit (e.g. Doppio 25% height)
+            const targetCupHeight = drink.cupHeight || "92%";
+            bgContainer.style.height = targetCupHeight;
+            labelContainer.style.height = targetCupHeight;
+
+            // Flush out existing layers
+            bgContainer.innerHTML = '';
+            labelContainer.innerHTML = '';
+
+            let layers = drink.layers;
+            if (drink.variants) {
+                const variantKey = activeVariant || drink.variants.active;
+                layers = drink.variants.specs[variantKey];
+            }
+
+            // Define animation constants for fluid sweep and text fade-in delay
+            const sweepDuration = 600; // matching CSS transition: 0.6s
+            const labelsDelay = 100; // short buffer after sweep finishes
+
+            // Render both fluid background (z-0) and label layers (z-20) in perfect sync
+            layers.forEach(layer => {
+                // 1. Build Background Segment (No text, just pure color gradients)
+                const bgSegment = document.createElement('div');
+                bgSegment.className = `fluid-layer-bg layer-${layer.type}`;
+                bgSegment.style.height = '0%'; // Set initial height to zero for sweep animation
+                bgContainer.appendChild(bgSegment);
+
+                // 2. Build Label Segment (Transparent background, centered text)
+                const labelSegment = document.createElement('div');
+                labelSegment.className = 'fluid-layer-label';
+                
+                // Labels share height with fluid segment, but remain invisible via CSS until parent toggles
+                labelSegment.style.height = layer.height;
+                labelSegment.innerText = layer.label;
+                labelContainer.appendChild(labelSegment);
+
+                // Let layout render, then transition heights concurrently
+                setTimeout(() => {
+                    bgSegment.style.height = layer.height;
+                }, 50);
+            });
+
+            // Synchronize text visibility: Add visible class after sweep animation finishes
+            setTimeout(() => {
+                labelContainer.classList.add('labels-visible');
+            }, sweepDuration + labelsDelay);
+        }
+
+        // Variant Selector Buttons Renderer
+        function buildVariantSelectors(containerId, drink, prefix) {
+            const container = document.getElementById(containerId);
+            if (!drink.variants) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            const labelSpan = document.getElementById(`${prefix}-variants-label`);
+            labelSpan.innerText = drink.variants.label;
+
+            const buttonsWrapper = document.getElementById(`${prefix}-variants-buttons`);
+            buttonsWrapper.innerHTML = '';
+
+            drink.variants.options.forEach(option => {
+                const isActive = drink.variants.active === option;
+                const activeClasses = "bg-cozy-gold text-cozy-wood";
+                const inactiveClasses = "bg-cozy-brown/60 text-cozy-goldlight hover:bg-cozy-gold/20 border border-cozy-gold/20";
+                
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition ${isActive ? activeClasses : inactiveClasses}`;
+                btn.innerText = option;
+                btn.onclick = () => {
+                    drink.variants.active = option;
+                    // Redraw variants on both layouts
+                    buildVariantSelectors('desktop-variants-container', drink, 'desktop');
+                    buildVariantSelectors('mobile-variants-container', drink, 'mobile');
+                    
+                    // Redraw fluids
+                    buildCupLayers('desktop-fluids-bg', 'desktop-fluids-labels', 'desktop-disposable-cup', drink, option);
+                    buildCupLayers('mobile-fluids-bg', 'mobile-fluids-labels', 'mobile-disposable-cup', drink, option);
+                };
+                buttonsWrapper.appendChild(btn);
+            });
+        }
+
+        // Global Drink Selection Engine
+        let currentlySelected = null;
+
+        function selectDrink(key) {
+            const drink = menuDataset[key];
+            if (!drink) return;
+
+            currentlySelected = key;
+
+            // Highlight chosen item on the active menu list
+            document.querySelectorAll('.menu-item-card').forEach(card => {
+                card.classList.remove('border-cozy-gold', 'bg-cozy-brown/80', 'scale-[1.01]', 'shadow-lg');
+            });
+            const activeCard = document.getElementById(`menu-item-${key}`);
+            if (activeCard) {
+                activeCard.classList.add('border-cozy-gold', 'bg-cozy-brown/80', 'scale-[1.01]', 'shadow-lg');
+            }
+
+            const isCold = drink.category === 'cold';
+            const isExtra = drink.category === 'extras';
+
+            // --- DESKTOP RENDER LOOP ---
+            const tempBadge = document.getElementById('drink-temp-badge');
+            const steamVisual = document.getElementById('steam-visual');
+            const cupElement = document.getElementById('desktop-disposable-cup');
+            const extraIconContainer = document.getElementById('desktop-extra-icon-container');
+
+            if (isExtra) {
+                // Hide dynamic cup & steam, show simple static icon
+                tempBadge.innerText = "Custom Extra";
+                tempBadge.className = "px-2.5 py-0.5 rounded-md text-[10px] uppercase font-black tracking-widest bg-yellow-600/30 text-yellow-400 border border-yellow-500/20";
+                steamVisual.style.display = 'none';
+                cupElement.style.display = 'none';
+                extraIconContainer.innerHTML = customExtraIcons[key] || '';
+                extraIconContainer.style.display = 'flex';
+                document.getElementById('desktop-variants-container').classList.add('hidden');
+            } else {
+                // Restore cup, dynamic layers, steam & badge status
+                cupElement.style.display = 'flex';
+                extraIconContainer.style.display = 'none';
+
+                if (isCold) {
+                    tempBadge.innerText = "Ice Refreshment";
+                    tempBadge.className = "px-2.5 py-0.5 rounded-md text-[10px] uppercase font-black tracking-widest bg-blue-600/30 text-blue-400 border border-blue-500/20";
+                    steamVisual.style.display = 'none';
+                } else {
+                    tempBadge.innerText = "Hot comfort";
+                    tempBadge.className = "px-2.5 py-0.5 rounded-md text-[10px] uppercase font-black tracking-widest bg-orange-600/30 text-orange-400 border border-orange-500/20";
+                    steamVisual.style.display = 'flex';
+                }
+
+                // Setup variants & modifiers
+                buildVariantSelectors('desktop-variants-container', drink, 'desktop');
+
+                // Dispatch proportioned sand-layered assembly
+                buildCupLayers('desktop-fluids-bg', 'desktop-fluids-labels', 'desktop-disposable-cup', drink);
+            }
+
+            document.getElementById('detail-name').innerText = drink.name;
+            document.getElementById('detail-desc').innerText = drink.description;
+            
+            // Build out recipe preparation card
+            const recipeCard = document.getElementById('recipe-card');
+            const recipeText = document.getElementById('recipe-text');
+            recipeText.innerText = drink.recipe;
+            recipeCard.classList.remove('hidden');
+
+
+            // --- MOBILE RENDER LOOP ---
+            const mobileBadge = document.getElementById('mobile-drink-temp-badge');
+            const mobileSteam = document.getElementById('steam-visual-mobile');
+            const mobileCup = document.getElementById('mobile-disposable-cup');
+            const mobileExtraContainer = document.getElementById('mobile-extra-icon-container');
+
+            if (isExtra) {
+                mobileBadge.innerText = "Custom Extra";
+                mobileBadge.className = "px-3 py-1 rounded-md text-[10px] uppercase font-black tracking-widest bg-yellow-600/30 text-yellow-400 border border-yellow-500/20";
+                mobileSteam.style.display = 'none';
+                mobileCup.style.display = 'none';
+                mobileExtraContainer.innerHTML = customExtraIcons[key] || '';
+                mobileExtraContainer.style.display = 'flex';
+                document.getElementById('mobile-variants-container').classList.add('hidden');
+            } else {
+                mobileCup.style.display = 'flex';
+                mobileExtraContainer.style.display = 'none';
+
+                if (isCold) {
+                    mobileBadge.innerText = "Ice Refreshment";
+                    mobileBadge.className = "px-3 py-1 rounded-md text-[10px] uppercase font-black tracking-widest bg-blue-600/30 text-blue-400 border border-blue-500/20";
+                    mobileSteam.style.display = 'none';
+                } else {
+                    mobileBadge.innerText = "Hot comfort";
+                    mobileBadge.className = "px-3 py-1 rounded-md text-[10px] uppercase font-black tracking-widest bg-orange-600/30 text-orange-400 border border-orange-500/20";
+                    mobileSteam.style.display = 'flex';
+                }
+
+                buildVariantSelectors('mobile-variants-container', drink, 'mobile');
+                buildCupLayers('mobile-fluids-bg', 'mobile-fluids-labels', 'mobile-disposable-cup', drink);
+            }
+
+            document.getElementById('mobile-detail-name').innerText = drink.name;
+            document.getElementById('mobile-detail-desc').innerText = drink.description;
+            document.getElementById('mobile-recipe-text').innerText = drink.recipe;
+
+            // Pop up mobile drawer if layout sits below large screen threshold (1024px)
+            if (window.innerWidth < 1024) {
+                openMobileModal();
+            }
+        }
+
+        // Mobile Bottom Sheet Controllers
+        function openMobileModal() {
+            const modal = document.getElementById('mobile-detail-modal');
+            const content = modal.firstElementChild;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('translate-y-full');
+        }
+
+        function closeMobileModal() {
+            const modal = document.getElementById('mobile-detail-modal');
+            const content = modal.firstElementChild;
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.add('translate-y-full');
+        }
+
+        // Section Filters
+        function filterMenu(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition bg-cozy-brown/60 text-cozy-goldlight hover:bg-cozy-gold/20";
+            });
+            
+            const activeBtn = document.getElementById(`filter-${category}`);
+            if (activeBtn) {
+                activeBtn.className = "filter-btn active px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition bg-cozy-gold text-cozy-wood";
+            }
+
+            if (category === 'all') {
+                document.querySelectorAll('.menu-section').forEach(sec => sec.classList.remove('hidden'));
+            } else {
+                document.querySelectorAll('.menu-section').forEach(sec => {
+                    if (sec.id === `section-${category}`) {
+                        sec.classList.remove('hidden');
+                    } else {
+                        sec.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // Story Overlay Toggle
+        function toggleStoryModal(show) {
+            const modal = document.getElementById('story-modal');
+            const container = modal.firstElementChild;
+            if (show) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                container.classList.remove('scale-95');
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                container.classList.add('scale-95');
+            }
+        }
+
+        // Run initializes on load
+        window.addEventListener('DOMContentLoaded', () => {
+            generateMenuHTML();
+            
+            // Set Latte as the default showcase recipe on startup
+            selectDrink('latte');
+
+            // Wire Story buttons
+            document.getElementById('story-btn').addEventListener('click', () => {
+                toggleStoryModal(true);
+            });
+        });
+    </script>
+</body>
+</html>
