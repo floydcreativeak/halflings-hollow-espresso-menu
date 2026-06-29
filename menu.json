@@ -6,33 +6,32 @@
       "items": [
         {
           "id": "h1",
-          "name": "The Shire's Shot",
-          "ounces": ["8oz", "12oz"],
+          "name": "Doppio",
+          "ounces": [
+            "12oz"
+          ],
           "temp": "HOT",
-          "description": "A bold double shot of our house blend, layered with perfectly textured steamed milk.",
-          "tags": ["Caffeinated", "House Special"],
-          "customization": ["Whole Milk Standard", "Oat Milk (+$.50)", "Extra Shot (+$1)"],
+          "description": "Two shots of espresso",
+          "tags": [
+            "Caffeine"
+          ],
+          "customization": [],
           "graphic": {
             "fluids": [
-              { "color": "#57151a", "ratio": 0.35, "textVisible": true, "text": "ESPRESSO", "textColor": "#F9F6F0" },
-              { "color": "#dcb871", "ratio": 0.45, "textVisible": true, "text": "STEAMED MILK", "textColor": "#20130C" },
-              { "color": "#e2ddcd", "ratio": 0.15, "textVisible": true, "text": "FOAM", "textColor": "#20130C" }
-            ]
-          }
-        },
-        {
-          "id": "h2",
-          "name": "Hobbiton Hazelnut",
-          "ounces": ["12oz", "16oz"],
-          "temp": "HOT",
-          "description": "Smooth espresso married with textured milk and our rich roasted hazelnut syrup.",
-          "tags": ["Sweet", "Nutty"],
-          "customization": ["Hot Only", "Half-Sweet Available"],
-          "graphic": {
-            "fluids": [
-              { "color": "#452610", "ratio": 0.20, "textVisible": true, "text": "HAZELNUT SYRUP", "textColor": "#F9F6F0" },
-              { "color": "#c39556", "ratio": 0.65, "textVisible": true, "text": "ESPRESSO & MILK", "textColor": "#20130C" },
-              { "color": "#ffffff", "ratio": 0.15, "textVisible": true, "text": "CREMA", "textColor": "#20130C" }
+              {
+                "color": "#5c371f",
+                "ratio": 0.2,
+                "textVisible": true,
+                "text": "Espresso",
+                "textColor": "#ffffff"
+              },
+              {
+                "color": "#A77D43",
+                "ratio": 0.05,
+                "textVisible": true,
+                "text": "Crema",
+                "textColor": "#ffffff"
+              }
             ]
           }
         }
@@ -44,17 +43,47 @@
       "items": [
         {
           "id": "c1",
-          "name": "Elven Matcha Pour",
-          "ounces": ["16oz", "24oz"],
+          "name": "Lotus",
+          "ounces": [
+            "16oz",
+            "24oz"
+          ],
           "temp": "COLD",
-          "description": "Ceremonial grade matcha lightly sweetened and served icy cold.",
-          "tags": ["Tea", "Earthy"],
-          "customization": ["Standard (Honey)", "Unsweetened"],
+          "description": "Pick a color, chose up to 3 syrus, cream or not, blended or not",
+          "tags": [
+            "Caffeinated",
+            "Iced",
+            "Blended"
+          ],
+          "customization": [
+            "Blended (+$1.00)",
+            "Red Lotus",
+            "Blue Lotus",
+            "Gold Lotus"
+          ],
           "graphic": {
             "fluids": [
-              { "color": "#e3dfcd", "ratio": 0.15, "textVisible": true, "text": "SWEET CREAM", "textColor": "#4B6343" },
-              { "color": "#577843", "ratio": 0.70, "textVisible": true, "text": "CEREMONIAL MATCHA", "textColor": "#F9F6F0" },
-              { "color": "#ffffff", "ratio": 0.15, "textVisible": true, "text": "ICE", "textColor": "#20130C" }
+              {
+                "color": "#ffb3d7",
+                "ratio": 0.2,
+                "textVisible": true,
+                "text": "Lotus Color",
+                "textColor": "#140A06"
+              },
+              {
+                "color": "#c7d4dc",
+                "ratio": 0.6,
+                "textVisible": true,
+                "text": "Club Soda",
+                "textColor": "#140A06"
+              },
+              {
+                "color": "#ffffff",
+                "ratio": 0.2,
+                "textVisible": true,
+                "text": "Whipped Cream",
+                "textColor": "#140A06"
+              }
             ]
           }
         }
