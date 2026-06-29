@@ -3,40 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Halfling's Hollow Espresso - Warmth in every cup, comfort in every bite.">
     <title>The Halfling's Hollow Espresso</title>
     
-    <link rel="stylesheet" href="https://raw.githack.com/mfd/f3d96ec7f0e8f034cc22ea73b3797b59/raw/856f1dbb8d807aabceb80b6d4f94b464df461b3e/gotham.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="halflingshollow_logo_master.png">
 </head>
 <body>
-
     <header>
-        <img src="halflingshollow_logo_master.png" alt="The Halfling's Hollow Espresso Logo" class="logo-img" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<h1 class=\'logo-img\'>THE HALFLING\'S HOLLOW</h1>');">
+        <img 
+            src="halflingshollow_logo_master.png" 
+            alt="The Halfling's Hollow Espresso Logo" 
+            class="logo-img" 
+            onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<h1 style=&quot;font-size: 2.5rem; font-weight: 700; margin: 1rem 0; letter-spacing: 2px;&quot;>THE HALFLING\'S HOLLOW</h1>');"
+        >
         <p class="tagline">Warmth in every cup, comfort in every bite.</p>
     </header>
 
     <main class="menu-container" id="menu-grid">
-        </main>
+        <!-- Menu items rendered by JavaScript -->
+    </main>
 
+    <!-- Seamless Card Modal -->
     <div class="seamless-overlay" id="seamless-overlay">
         <div class="close-hint" id="close-hint">ESC / CLICK OUTSIDE TO CLOSE</div>
         
+        <!-- Floating Graphic (appears on flip) -->
         <div class="floating-graphic" id="floating-graphic"></div>
 
+        <!-- Seamless Card Container -->
         <div class="seamless-card-container" id="seamless-card">
             <div class="flip-hint">Tap card to flip</div>
             <div class="seamless-card-inner" id="seamless-card-inner">
-                
-                <div class="seamless-front" id="sl-front">
-                    </div>
-
-                <div class="seamless-back" id="sl-back">
-                     </div>
-
+                <div class="seamless-front" id="sl-front"></div>
+                <div class="seamless-back" id="sl-back"></div>
             </div>
         </div>
     </div>
 
+    <!-- App Script -->
     <script src="app.js" defer></script>
 </body>
 </html>
