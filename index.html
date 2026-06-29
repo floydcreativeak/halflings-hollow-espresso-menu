@@ -1,47 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The Halfling's Hollow Espresso - Warmth in every cup, comfort in every bite.">
-    <title>The Halfling's Hollow Espresso</title>
-    
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/x-icon" href="halflingshollow_logo_master.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Halfling's Hollow Espresso &mdash; Menu</title>
+  <meta name="description" content="Not all who wander are lost... some are just looking for coffee. The interactive menu for The Halfling's Hollow Espresso — hot and cold drinks, sizes, options, and a cutaway cup preview." />
+  <meta name="theme-color" content="#ffffff" />
+
+  <!-- Poppins font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <header>
-        <img 
-            src="halflingshollow_logo_master.png" 
-            alt="The Halfling's Hollow Espresso Logo" 
-            class="logo-img" 
-            onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<h1 style=&quot;font-size: 2.5rem; font-weight: 700; margin: 1rem 0; letter-spacing: 2px;&quot;>THE HALFLING\'S HOLLOW</h1>');"
-        >
-        <p class="tagline">Warmth in every cup, comfort in every bite.</p>
-    </header>
-
-    <main class="menu-container" id="menu-grid">
-        <!-- Menu items rendered by JavaScript -->
-    </main>
-
-    <!-- Seamless Card Modal -->
-    <div class="seamless-overlay" id="seamless-overlay">
-        <div class="close-hint" id="close-hint">ESC / CLICK OUTSIDE TO CLOSE</div>
-        
-        <!-- Floating Graphic (appears on flip) -->
-        <div class="floating-graphic" id="floating-graphic"></div>
-
-        <!-- Seamless Card Container -->
-        <div class="seamless-card-container" id="seamless-card">
-            <div class="flip-hint">Tap card to flip</div>
-            <div class="seamless-card-inner" id="seamless-card-inner">
-                <div class="seamless-front" id="sl-front"></div>
-                <div class="seamless-back" id="sl-back"></div>
-            </div>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <i data-feather="coffee"></i>
+        </span>
+        <div class="brand-text">
+          <h1>The Halfling's Hollow Espresso</h1>
+          <p>Not all who wander are lost&hellip; some are just looking for coffee.</p>
         </div>
+      </div>
+
+      <div class="header-actions">
+        <label class="search" aria-label="Search drinks">
+          <i data-feather="search" aria-hidden="true"></i>
+          <input type="search" id="search" placeholder="Search drinks&hellip;" autocomplete="off" />
+        </label>
+        <button id="order-btn" class="order-btn" type="button" aria-label="View my order">
+          <i data-feather="shopping-bag" aria-hidden="true"></i>
+          <span class="order-btn-label">My Order</span>
+          <span class="order-count" id="order-count" hidden>0</span>
+        </button>
+        <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle theme">
+          <i data-feather="moon" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- App Script -->
-    <script src="app.js" defer></script>
+    <nav class="tabs" id="category-tabs" aria-label="Drink categories">
+      <button class="tab is-active" data-category="all" type="button">All</button>
+      <button class="tab" data-category="hot" type="button"><i data-feather="thermometer" aria-hidden="true"></i> Hot</button>
+      <button class="tab" data-category="cold" type="button"><i data-feather="wind" aria-hidden="true"></i> Cold</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="menu-grid" class="menu-grid" aria-label="Drinks menu"></section>
+    <p id="empty-state" class="empty-state" hidden>No drinks match your search.</p>
+  </main>
+
+  <footer class="app-footer">
+    <p>The Halfling's Hollow Espresso &mdash; not all who wander are lost&hellip; some are just looking for coffee.</p>
+  </footer>
+
+  <!-- Drink detail / customization modal -->
+  <div class="modal-overlay" id="modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="icon-btn modal-close" id="modal-close" type="button" aria-label="Close">
+        <i data-feather="x" aria-hidden="true"></i>
+      </button>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Welcome-back / resume saved order prompt -->
+  <div class="modal-overlay" id="resume-modal" hidden>
+    <div class="modal resume-modal" role="dialog" aria-modal="true" aria-labelledby="resume-title">
+      <div class="resume-body">
+        <span class="prep-brand"><i data-feather="coffee" aria-hidden="true"></i> The Halfling's Hollow Espresso</span>
+        <h2 id="resume-title">Welcome back, wanderer</h2>
+        <p id="resume-text">You have a saved order waiting. Keep it, or start fresh?</p>
+        <div class="resume-actions">
+          <button class="btn-secondary" type="button" data-resume="clear"><i data-feather="trash-2" aria-hidden="true"></i> Remove last order</button>
+          <button class="add-btn" type="button" data-resume="keep"><i data-feather="check" aria-hidden="true"></i> Keep my order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feather icons -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.2/dist/feather.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
