@@ -1,0 +1,77 @@
+{
+  "cardStyle": {
+    "backgroundColor": "#20130c",
+    "borderColor": "#a77d43",
+    "texture": "none"
+  },
+  "front": {
+    "title": {
+      "top": 10,
+      "left": 7,
+      "width": 240,
+      "align": "center",
+      "visible": true,
+      "color": "rgb(248, 244, 237)",
+      "fontSize": 20,
+      "fontWeight": "700"
+    },
+    "graphic": {
+      "top": 60,
+      "left": 8,
+      "width": 240,
+      "align": "center",
+      "visible": true,
+      "textStyle": {
+        "fontSize": 8,
+        "fontWeight": 900,
+        "letterSpacing": 0.5
+      }
+    },
+    "pucks": {
+      "top": 330,
+      "left": 10,
+      "width": 240,
+      "align": "center",
+      "visible": true
+    }
+  },
+  "back": {
+    "title": {
+      "top": 10,
+      "left": 9,
+      "width": 220,
+      "align": "left",
+      "visible": true,
+      "color": "rgb(249, 246, 240)",
+      "fontSize": 18,
+      "fontWeight": "700"
+    },
+    "desc": {
+      "top": 40,
+      "left": 10,
+      "width": 220,
+      "align": "left",
+      "visible": true,
+      "color": "rgb(249, 246, 240)",
+      "fontSize": 14,
+      "fontWeight": "400"
+    },
+    "custom": {
+      "top": 134,
+      "left": 11,
+      "width": 234,
+      "align": "left",
+      "visible": true,
+      "color": "rgb(191, 174, 163)",
+      "fontSize": 13,
+      "fontWeight": "400"
+    },
+    "pucks": {
+      "top": 270,
+      "left": 11,
+      "width": 234,
+      "align": "left",
+      "visible": true
+    }
+  }
+}
